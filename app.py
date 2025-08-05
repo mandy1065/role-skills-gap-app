@@ -32,7 +32,7 @@ st.markdown("""
             font-size: 1.05em;
         }
     </style>
-"""", unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # Role, Skills and Corresponding Courses
 roles = {
