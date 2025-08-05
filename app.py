@@ -13,9 +13,9 @@ scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/au
 creds_dict = json.loads(st.secrets["GCP_CREDENTIALS"])
 creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
-sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/13W17_W3rSIvWCSuYDLo-RX__y365UA7SECB5vOTZ9xs/edit").sheet1
+sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/13W17_W3rSIvWCSuYDLo-RX__y365UA7SECB5vOTZ9xs/edit?usp=sharing").sheet1
 
-# Define the full roles dictionary with skills and course links
+# Role → Skills → Course links
 roles = {
     "QA Analyst": {
         "skills": {
@@ -98,35 +98,42 @@ roles = {
     }
 }
 
-# App UI
 st.title("Brainyscout Skill Gap Tracker")
+st.markdown("Select your role, mark the skills you already have, and get a list of missing skills with course recommendations.")
 
-user_email = st.text_input("Enter your email to track your progress:")
+email = st.text_input("Enter your email:", "")
 
-role = st.selectbox("Select your Role", list(roles.keys()))
-skills_dict = roles[role]["skills"]
-all_skills = list(skills_dict.keys())
+selected_role = st.selectbox("Select Role", list(roles.keys()))
+all_skills = list(roles[selected_role]["skills"].keys())
 
-selected_skills = st.multiselect("Select skills you already know:", all_skills)
-missing_skills = sorted(list(set(all_skills) - set(selected_skills)))
+known_skills = st.multiselect("Select Known Skills", options=all_skills)
+missing_skills = [skill for skill in all_skills if skill not in known_skills]
 
-# Save to Google Sheet
-if user_email:
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    sheet.append_row([timestamp, user_email, role, ",".join(selected_skills), ",".join(missing_skills)])
+# Save to Google Sheets
+if email:
+    sheet.append_row([
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        email,
+        selected_role,
+        ", ".join(known_skills),
+        ", ".join(missing_skills)
+    ])
 
-# Display missing skills and course links
+# Display missing skills and links
 if missing_skills:
-    st.subheader("Missing Skills & Recommended Courses")
+    st.subheader("Missing Skills & Courses")
     for skill in missing_skills:
-        st.markdown(f"**{skill}** â†’ [Course Link]({skills_dict[skill]})")
+        link = roles[selected_role]["skills"][skill]
+        st.markdown(f"**{skill}** → [Course Link]({link})")
 else:
-    st.success("You have all the required skills!")
+    st.success("You have all the skills for this role!")
 
-# Show full course map
-with st.expander("View Full Learning Plan"):
-    course_df = pd.DataFrame([(k, v) for k, v in skills_dict.items()], columns=["Skill", "Course Link"])
-    st.dataframe(course_df)
+# Full course roadmap
+with st.expander("Full Learning Plan"):
+    st.write(pd.DataFrame({
+        "Skill": list(roles[selected_role]["skills"].keys()),
+        "Course Link": list(roles[selected_role]["skills"].values())
+    }))
 
 st.markdown("---")
-st.markdown('<div style="text-align: center;">Powered by <strong>Brainyscout</strong></div>', unsafe_allow_html=True)
+st.markdown('<div style="text-align: center;">Powered by Brainyscout</div>', unsafe_allow_html=True)
