@@ -1,337 +1,119 @@
-"""
-Streamlit Skill Gap Analysis App
-================================
-
-This Streamlit application allows a user to choose a target role and
-select which of the required skills they already possess.  It then
-computes the missing skills and offers course recommendations that
-cover those gaps.  The data used here is derived from reputable
-sources – for example, Product School and other educational
-providers – and summarises the core skills required for Product
-Managers, UX Researchers and Product Analysts.  Each course
-recommendation includes a name, a brief description and a link to the
-course provider.
-
-The user interface is intentionally simple: choose a role, tick off
-your existing skills, then review the missing skills and suggested
-courses.  Feel free to extend or modify the lists of skills and
-courses to suit your needs.
-"""
 
 import streamlit as st
-import pandas as pd
 
+# Inject custom CSS for styling
+st.markdown("""
+    <style>
+        body {
+            background-color: #f7f9fc;
+        }
+        .title {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #003366;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 1.2em;
+            color: #444444;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .footer {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.9em;
+            color: #888888;
+        }
+        .stMarkdown {
+            font-size: 1.05em;
+        }
+    </style>
+"""", unsafe_allow_html=True)
 
-@st.cache_data
-def get_role_skills():
-    """
-    Returns a dictionary mapping roles to the list of
-    fundamental skills expected for that role.
-
-    The skill sets were compiled from multiple credible
-    sources.  See the accompanying documentation for
-    more detail on the derivation of each skill.
-    """
-    return {
-        "Product Manager": [
-            "Strategic thinking",
-            "Market sensitivity",
-            "User‑centric design",
-            "Writing technical requirements",
-            "Data analysis",
-            "UX/UI design",
-            "Collaboration & leadership",
-            "Empathy",
-            "Problem‑solving",
-        ],
-        "UX Researcher": [
-            "Empathy",
-            "Analytical thinking",
-            "Effective communication",
-            "Curiosity",
-            "Problem‑solving",
-            "Collaboration",
-            "Technical proficiency",
-        ],
-        "Product Analyst": [
-            "Data analysis",
-            "Market research",
-            "Product management tools",
-            "UX design",
-            "A/B testing",
-            "SQL & database knowledge",
-            "Communication",
-            "Problem‑solving",
-            "Critical thinking",
-            "Stakeholder management",
-            "Teamwork & collaboration",
-            "Adaptability",
-            "Attention to detail",
-        ],
+# Role, Skills and Corresponding Courses
+roles = {
+    "QA Analyst": {
+        "skills": {
+            "Test case design": "https://www.coursera.org/learn/software-testing",
+            "Manual testing": "https://www.udemy.com/course/manual-software-testing/",
+            "Bug reporting (JIRA)": "https://www.udemy.com/course/jira-tutorial-a-complete-guide-for-beginners/",
+            "SQL for data validation": "https://www.coursera.org/learn/sql-for-data-science",
+            "Functional testing": "https://www.udemy.com/course/software-testing/",
+            "Regression testing": "https://www.linkedin.com/learning/",
+            "SDLC knowledge": "https://www.youtube.com/watch?v=xtPYTfLJZBM",
+            "Communication skills": "https://www.coursera.org/learn/business-communication"
+        }
+    },
+    "QA Automation Engineer": {
+        "skills": {
+            "Python": "https://www.coursera.org/specializations/python",
+            "Selenium/WebDriver": "https://www.udemy.com/course/selenium-real-time-examplesinterview-questions/",
+            "API Testing (Postman)": "https://www.coursera.org/learn/postman-api",
+            "TestNG/PyTest": "https://www.udemy.com/course/pytest-tutorial/",
+            "CI/CD with Jenkins": "https://www.coursera.org/learn/continuous-integration",
+            "Version Control (Git)": "https://www.codecademy.com/learn/learn-git",
+            "BDD (Cucumber/Gherkin)": "https://www.udemy.com/course/bdd-with-selenium-webdriver-and-cucumber/",
+            "Framework Design": "https://www.udemy.com/course/test-automation-frameworks/"
+        }
+    },
+    "Software Developer": {
+        "skills": {
+            "Data Structures & Algorithms": "https://www.coursera.org/specializations/data-structures-algorithms",
+            "OOP (Java/Python/C#)": "https://www.coursera.org/learn/python-object-oriented-programming",
+            "HTML/CSS/JavaScript": "https://www.freecodecamp.org/learn/",
+            "SQL/NoSQL": "https://lagunita.stanford.edu/courses/DB/2014/SelfPaced/about",
+            "REST APIs": "https://www.udacity.com/course/api-development-and-documentation--ud805",
+            "Git/GitHub": "https://www.youtube.com/watch?v=RGOj5yH7evk",
+            "Unit Testing": "https://www.coursera.org/learn/automated-software-testing",
+            "Agile Development": "https://www.coursera.org/learn/agile-atlassian-jira"
+        }
+    },
+    "Data Engineer": {
+        "skills": {
+            "SQL & NoSQL": "https://mode.com/sql-tutorial/",
+            "ETL pipelines": "https://www.udemy.com/course/etl-and-data-pipelines-with-python/",
+            "Python/Scala": "https://www.coursera.org/learn/python-data-analysis",
+            "Big Data (Spark, Hadoop)": "https://www.coursera.org/learn/intro-to-apache-spark",
+            "Data Warehousing": "https://www.coursera.org/learn/dwh",
+            "Cloud (AWS/GCP/Azure)": "https://www.coursera.org/professional-certificates/data-engineering-gcp",
+            "Apache Airflow": "https://www.udemy.com/course/the-complete-hands-on-course-to-master-apache-airflow/",
+            "Data Modeling": "https://www.coursera.org/learn/data-modeling"
+        }
+    },
+    "Data Analyst": {
+        "skills": {
+            "SQL": "https://www.udemy.com/course/sql-for-data-analytics/",
+            "Excel & Google Sheets": "https://www.coursera.org/specializations/excel",
+            "Tableau/Power BI": "https://www.coursera.org/learn/visual-analytics-tableau",
+            "Python (Pandas, Numpy)": "https://www.coursera.org/learn/data-analysis-with-python",
+            "A/B Testing": "https://www.udacity.com/course/ab-testing--ud257",
+            "Statistics": "https://online.stanford.edu/courses/sohs-ystatslearningstatisticallearning",
+            "Business Communication": "https://www.coursera.org/learn/business-writing"
+        }
     }
+}
 
+st.markdown('<div class="title">Skill Gap Analyzer</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">Find missing skills for your role and recommended courses to upskill.</div>', unsafe_allow_html=True)
 
-@st.cache_data
-def get_skill_courses():
-    """
-    Returns a mapping from skill to a list of course dictionaries.  Each
-    course dictionary contains the course name, a brief description and
-    a URL.  A single skill may be covered by multiple courses.
-    """
-    return {
-        # Courses for Product Manager skills
-        "Strategic thinking": [
-            {
-                "name": "Strategic Management – Copenhagen Business School",
-                "url": "https://www.coursera.org/learn/strategic-management",
-                "description": "Develop long‑term vision and strategic planning abilities with a focus on organizational and competitive strategy.",
-            },
-        ],
-        "Market sensitivity": [
-            {
-                "name": "Market Research and Consumer Behavior – IE University",
-                "url": "https://www.coursera.org/learn/market-research",
-                "description": "Learn to analyse markets, understand consumer behaviour and design surveys to gather insights.",
-            },
-        ],
-        "User‑centric design": [
-            {
-                "name": "Google UX Design Professional Certificate",
-                "url": "https://www.coursera.org/professional-certificates/google-ux-design",
-                "description": "Master the fundamentals of user research, wireframing, prototyping and usability testing for digital products.",
-            },
-        ],
-        "Writing technical requirements": [
-            {
-                "name": "Client Needs and Software Requirements – University of Alberta",
-                "url": "https://www.coursera.org/learn/software-requirements",
-                "description": "Learn to elicit, analyse and document software requirements in agile and traditional projects.",
-            },
-        ],
-        "Data analysis": [
-            {
-                "name": "Google Data Analytics Professional Certificate",
-                "url": "https://www.coursera.org/professional-certificates/google-data-analytics",
-                "description": "Build data literacy, clean and prepare data, and create dashboards and visualisations to communicate insights.",
-            },
-            {
-                "name": "SQL for Data Science – University of California, Davis",
-                "url": "https://www.coursera.org/learn/sql-for-data-science",
-                "description": "Gain hands‑on experience with SQL queries, database design, data cleansing and analysis.",
-            },
-        ],
-        "UX/UI design": [
-            {
-                "name": "Google UX Design Professional Certificate",
-                "url": "https://www.coursera.org/professional-certificates/google-ux-design",
-                "description": "Understand user research, design principles and prototyping for intuitive experiences.",
-            },
-        ],
-        "Collaboration & leadership": [
-            {
-                "name": "High Performance Collaboration: Leadership, Teamwork, and Negotiation – Northwestern University",
-                "url": "https://www.coursera.org/learn/leadership-collaboration",
-                "description": "Develop negotiation, teamwork and leadership skills for high‑performance teams.",
-            },
-        ],
-        "Empathy": [
-            {
-                "name": "Emotional Intelligence: Cultivating Immensely Human Interactions – University of Michigan",
-                "url": "https://www.coursera.org/learn/emotional-intelligence",
-                "description": "Cultivate empathy, communication and interpersonal skills to connect with users and colleagues.",
-            },
-        ],
-        "Problem‑solving": [
-            {
-                "name": "Creative Problem Solving – University of Minnesota",
-                "url": "https://www.coursera.org/learn/creative-problem-solving",
-                "description": "Boost creative and critical thinking abilities and learn frameworks for innovative problem solving.",
-            },
-        ],
-        # Additional skills for UX Researcher
-        "Analytical thinking": [
-            {
-                "name": "Google Data Analytics Professional Certificate",
-                "url": "https://www.coursera.org/professional-certificates/google-data-analytics",
-                "description": "Develop analytical skills through data cleaning, analysis and visualisation projects.",
-            },
-        ],
-        "Effective communication": [
-            {
-                "name": "High Performance Collaboration: Leadership, Teamwork, and Negotiation – Northwestern University",
-                "url": "https://www.coursera.org/learn/leadership-collaboration",
-                "description": "Learn to communicate effectively with stakeholders and negotiate in collaborative environments.",
-            },
-        ],
-        "Curiosity": [
-            {
-                "name": "Creative Problem Solving – University of Minnesota",
-                "url": "https://www.coursera.org/learn/creative-problem-solving",
-                "description": "Build curiosity and innovative thinking through structured problem‑solving techniques.",
-            },
-        ],
-        "Collaboration": [
-            {
-                "name": "High Performance Collaboration: Leadership, Teamwork, and Negotiation – Northwestern University",
-                "url": "https://www.coursera.org/learn/leadership-collaboration",
-                "description": "Gain collaboration and negotiation skills essential for working in cross‑functional teams.",
-            },
-        ],
-        "Technical proficiency": [
-            {
-                "name": "Google UX Design Professional Certificate",
-                "url": "https://www.coursera.org/professional-certificates/google-ux-design",
-                "description": "Understand user research techniques, wireframing and prototyping tools for digital product design.",
-            },
-            {
-                "name": "Client Needs and Software Requirements – University of Alberta",
-                "url": "https://www.coursera.org/learn/software-requirements",
-                "description": "Learn to identify and translate user needs into technical software requirements.",
-            },
-        ],
-        # Additional skills for Product Analyst
-        "Market research": [
-            {
-                "name": "Market Research and Consumer Behavior – IE University",
-                "url": "https://www.coursera.org/learn/market-research",
-                "description": "Master market analysis, survey design and consumer behaviour insights.",
-            },
-        ],
-        "Product management tools": [
-            {
-                "name": "Strategic Management – Copenhagen Business School",
-                "url": "https://www.coursera.org/learn/strategic-management",
-                "description": "Understand strategic frameworks and tools used in product and business management.",
-            },
-            {
-                "name": "Client Needs and Software Requirements – University of Alberta",
-                "url": "https://www.coursera.org/learn/software-requirements",
-                "description": "Learn to prioritise and manage product requirements using agile approaches.",
-            },
-        ],
-        "UX design": [
-            {
-                "name": "Google UX Design Professional Certificate",
-                "url": "https://www.coursera.org/professional-certificates/google-ux-design",
-                "description": "Gain foundational knowledge in user research, design thinking, prototyping and usability testing.",
-            },
-        ],
-        "A/B testing": [
-            {
-                "name": "Google Data Analytics Professional Certificate",
-                "url": "https://www.coursera.org/professional-certificates/google-data-analytics",
-                "description": "Learn to design experiments, perform A/B tests and interpret results using data analytics tools.",
-            },
-        ],
-        "SQL & database knowledge": [
-            {
-                "name": "SQL for Data Science – University of California, Davis",
-                "url": "https://www.coursera.org/learn/sql-for-data-science",
-                "description": "Build fluency in SQL querying, database design and data wrangling for analysis.",
-            },
-        ],
-        "Communication": [
-            {
-                "name": "High Performance Collaboration: Leadership, Teamwork, and Negotiation – Northwestern University",
-                "url": "https://www.coursera.org/learn/leadership-collaboration",
-                "description": "Develop communication and negotiation skills for managing stakeholders and teams.",
-            },
-        ],
-        "Critical thinking": [
-            {
-                "name": "Creative Problem Solving – University of Minnesota",
-                "url": "https://www.coursera.org/learn/creative-problem-solving",
-                "description": "Sharpen critical thinking and reasoning through structured innovation methods.",
-            },
-        ],
-        "Stakeholder management": [
-            {
-                "name": "High Performance Collaboration: Leadership, Teamwork, and Negotiation – Northwestern University",
-                "url": "https://www.coursera.org/learn/leadership-collaboration",
-                "description": "Learn to manage stakeholders, negotiate priorities and foster effective collaboration.",
-            },
-        ],
-        "Teamwork & collaboration": [
-            {
-                "name": "High Performance Collaboration: Leadership, Teamwork, and Negotiation – Northwestern University",
-                "url": "https://www.coursera.org/learn/leadership-collaboration",
-                "description": "Build teamwork skills and understand group dynamics for successful project delivery.",
-            },
-        ],
-        "Adaptability": [
-            {
-                "name": "Creative Problem Solving – University of Minnesota",
-                "url": "https://www.coursera.org/learn/creative-problem-solving",
-                "description": "Cultivate adaptability and flexibility to adjust to changing business contexts.",
-            },
-        ],
-        "Attention to detail": [
-            {
-                "name": "SQL for Data Science – University of California, Davis",
-                "url": "https://www.coursera.org/learn/sql-for-data-science",
-                "description": "Practice detailed data querying and quality checks necessary for precise analysis.",
-            },
-        ],
-    }
+role = st.selectbox("ðŸŽ¯ Select your role", list(roles.keys()))
 
+if role:
+    st.markdown("### âœ… Select the skills you already have")
+    selected_skills = st.multiselect("Choose your known skills", list(roles[role]["skills"].keys()))
 
-def main():
-    st.set_page_config(page_title="Skill Gap & Course Recommendations", page_icon="🎯", layout="wide")
-    st.title("Skill Gap Analysis & Course Recommendations")
-    st.markdown(
-        """
-        Use this tool to understand which skills you may still need to develop for a particular career path, and discover
-        relevant courses to fill those gaps.  Simply select a role and tick off the skills you already possess – the app
-        will show you any missing skills and recommend courses that cover them.
-        """
-    )
+    missing_skills = [s for s in roles[role]["skills"] if s not in selected_skills]
 
-    role_skills = get_role_skills()
-    skill_courses = get_skill_courses()
-
-    role = st.selectbox("Select your target role", ["(choose a role)"] + list(role_skills.keys()))
-
-    if role and role != "(choose a role)":
-        required_skills = role_skills[role]
-        st.subheader(f"Required skills for {role}")
-        st.write(
-            "Below is a list of key skills for the selected role. Tick the ones you already possess in order to identify gaps."
-        )
-        user_skills = st.multiselect(
-            "Select the skills you already have", options=required_skills, default=[]
-        )
-        missing = list(sorted(set(required_skills) - set(user_skills)))
-
-        # Display results
-        if user_skills:
-            st.success(f"You selected {len(user_skills)} skill(s).")
-        else:
-            st.info("You have not selected any skills yet.")
-
-        if missing:
-            st.warning(f"Missing skills ({len(missing)}): {', '.join(missing)}")
-            st.subheader("Recommended Courses")
-            # Build a list of recommended courses for each missing skill
-            for skill in missing:
-                courses = skill_courses.get(skill, [])
-                if courses:
-                    with st.expander(f"Courses for '{skill}'"):
-                        for course in courses:
-                            name = course.get("name")
-                            url = course.get("url")
-                            desc = course.get("description")
-                            st.markdown(f"- **{name}** – {desc}  ")
-                            st.markdown(f"  [View Course]({url})")
-                else:
-                    st.info(f"No specific courses listed for {skill}.")
-        else:
-            if role:
-                st.success(
-                    "Congratulations! According to the selected skill set you have all the required skills for this role."
-                )
+    if missing_skills:
+        st.markdown("### âŒ Missing Skills & Recommended Courses")
+        for skill in missing_skills:
+            st.markdown(f"- **{skill}** â†’ [Course Link]({roles[role]['skills'][skill]})")
     else:
-        st.info("Please select a role to begin.")
+        st.success("ðŸŽ‰ You have all the listed skills for this role!")
 
-
-if __name__ == "__main__":
-    main()
+# Add Footer
+st.markdown('<div class="footer">Powered by <strong>Brainyscout</strong></div>', unsafe_allow_html=True)
