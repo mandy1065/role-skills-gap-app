@@ -87,6 +87,27 @@ roles = {
         }
     },
     "Data Analyst": {
+    "Product Manager": {
+        "skills": {
+            "Strategic thinking": "https://www.coursera.org/learn/strategic-management",
+            "Market research": "https://www.coursera.org/learn/market-research",
+            "User-centric design": "https://www.coursera.org/specializations/interaction-design",
+            "Technical documentation": "https://www.udemy.com/course/technical-writing/",
+            "Data analysis": "https://www.coursera.org/learn/data-analysis-with-python",
+            "Agile product development": "https://www.coursera.org/learn/agile-development"
+        }
+    },
+    "Project Manager": {
+        "skills": {
+            "Project planning": "https://www.coursera.org/learn/project-management-principles",
+            "Agile methodology": "https://www.coursera.org/learn/agile-project-management",
+            "Risk management": "https://www.coursera.org/learn/project-risk-management",
+            "Team communication": "https://www.coursera.org/learn/communication-in-the-21st-century-workplace",
+            "Budgeting and cost control": "https://www.udemy.com/course/project-budgeting-cost-control/",
+            "Project scheduling tools": "https://www.coursera.org/learn/project-management-tools"
+        }
+    },
+
         "skills": {
             "SQL": "https://www.udemy.com/course/sql-for-data-analytics/",
             "Excel & Google Sheets": "https://www.coursera.org/specializations/excel",
