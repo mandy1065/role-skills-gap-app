@@ -1,7 +1,7 @@
 
 import streamlit as st
 
-# Inject custom CSS for styling
+# Inject custom CSS
 st.markdown("""
     <style>
         body {
@@ -21,9 +21,7 @@ st.markdown("""
             margin-bottom: 30px;
         }
         .footer {
-            position: fixed;
-            bottom: 20px;
-            width: 100%;
+            margin-top: 50px;
             text-align: center;
             font-size: 0.9em;
             color: #888888;
@@ -34,7 +32,11 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Role, Skills and Corresponding Courses
+# Title
+st.markdown('<div class="title">Skill Gap Analyzer</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">Find missing skills for your role and recommended courses to upskill.</div>', unsafe_allow_html=True)
+
+# Skill mappings
 roles = {
     "QA Analyst": {
         "skills": {
@@ -97,23 +99,37 @@ roles = {
     }
 }
 
-st.markdown('<div class="title">Skill Gap Analyzer</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">Find missing skills for your role and recommended courses to upskill.</div>', unsafe_allow_html=True)
+# Sidebar tracking
+st.sidebar.title("ðŸ“Š Skill Tracking")
+selected_role = st.sidebar.selectbox("Select Role", list(roles.keys()))
+tracked_skills = st.sidebar.multiselect("Mark Skills as Completed", list(roles[selected_role]["skills"].keys()))
 
-role = st.selectbox("ðŸŽ¯ Select your role", list(roles.keys()))
+# Display main section
+role = st.selectbox("Select your role", list(roles.keys()))
 
 if role:
-    st.markdown("### âœ… Select the skills you already have")
+    st.markdown("### Select the skills you already have")
     selected_skills = st.multiselect("Choose your known skills", list(roles[role]["skills"].keys()))
 
     missing_skills = [s for s in roles[role]["skills"] if s not in selected_skills]
 
     if missing_skills:
-        st.markdown("### âŒ Missing Skills & Recommended Courses")
+        st.markdown("### Missing Skills & Recommended Courses")
         for skill in missing_skills:
             st.markdown(f"- **{skill}** â†’ [Course Link]({roles[role]['skills'][skill]})")
     else:
-        st.success("ðŸŽ‰ You have all the listed skills for this role!")
+        st.success("You have all the listed skills for this role!")
 
-# Add Footer
+# Show tracked progress
+if tracked_skills:
+    st.sidebar.markdown("### âœ… Completed Skills")
+    for skill in tracked_skills:
+        st.sidebar.markdown(f"- {skill}")
+
+    st.sidebar.markdown("### âŒ Pending Skills")
+    for skill in roles[selected_role]["skills"]:
+        if skill not in tracked_skills:
+            st.sidebar.markdown(f"- {skill}")
+
+# Footer
 st.markdown('<div class="footer">Powered by <strong>Brainyscout</strong></div>', unsafe_allow_html=True)
