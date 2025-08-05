@@ -99,14 +99,12 @@ roles = {
 }
 
 # -----------------------------------------------------------------------------
-# User Interface
+# Updated User Interface
 #
-# The app is organized with a sidebar for user inputs and a main area with
-# dashboard tabs. Users can enter their email, choose a role and mark their
-# existing skills in the sidebar. The main area then displays: a skill
-# checker tab (missing skills and recommended courses), a learning plan tab
-# (complete list of skills and courses for the selected role) and a progress
-# tracker tab (completed vs pending skills).
+# We organize the interface with a sidebar for user inputs and three dashboard
+# tabs for skill checking, a learning plan, and a progress tracker. Users can
+# mark their completed skills via checkboxes and save their progress. Data is
+# stored in Google Sheets whenever the email field is filled.
 
 st.title("Brainyscout Skill Gap Tracker")
 st.markdown(
@@ -121,22 +119,31 @@ email = st.sidebar.text_input("Enter your email:", "")
 selected_role = st.sidebar.selectbox("Select Role", list(roles.keys()))
 all_skills = list(roles[selected_role]["skills"].keys())
 
-# Known skills selection in sidebar
-known_skills = st.sidebar.multiselect("Select Known Skills", options=all_skills)
+# Initialize session state to track completed skills for the user
+if 'completed_skills' not in st.session_state:
+    st.session_state['completed_skills'] = []
 
-# Compute missing skills
-missing_skills = [skill for skill in all_skills if skill not in known_skills]
+# Multiselect to predefine completed skills; default uses session state
+initial_known = st.session_state.get('completed_skills', [])
+known_skills_sidebar = st.sidebar.multiselect(
+    "Select Known Skills", options=all_skills, default=initial_known
+)
 
-# Save the current session's data to Google Sheets when an email is provided.
-# This will append a record each time the page reloads and the email field
-# contains a value. The timestamp allows tracking of progress over time.
+# Synchronize session state with sidebar selection if it changes
+if set(known_skills_sidebar) != set(st.session_state['completed_skills']):
+    st.session_state['completed_skills'] = known_skills_sidebar
+
+# Determine missing skills based on current completed skills
+missing_skills_list = [s for s in all_skills if s not in st.session_state['completed_skills']]
+
+# Append the user's progress to Google Sheets (timestamp, email, role, known, missing)
 if email:
     sheet.append_row([
         datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         email,
         selected_role,
-        ", ".join(known_skills),
-        ", ".join(missing_skills)
+        ", ".join(st.session_state['completed_skills']),
+        ", ".join(missing_skills_list)
     ])
 
 # Define dashboard tabs
@@ -147,10 +154,10 @@ tab_skill_checker, tab_learning_plan, tab_progress = st.tabs(
 # ----------------------- Skill Checker Tab ------------------------------
 with tab_skill_checker:
     st.subheader("Missing Skills & Recommended Courses")
-    if missing_skills:
+    if missing_skills_list:
         # Build a markdown table for missing skills and courses
         table_rows = ""
-        for skill in missing_skills:
+        for skill in missing_skills_list:
             link = roles[selected_role]["skills"][skill]
             table_rows += f"| {skill} | [Course Link]({link}) |\n"
         markdown_table = "| Missing Skill | Course |\n| --- | --- |\n" + table_rows
@@ -171,17 +178,44 @@ with tab_learning_plan:
 # ----------------------- Progress Tracker Tab ---------------------------
 with tab_progress:
     st.subheader("Skill Progress Tracker")
-    # Build a table showing completed vs pending skills for the selected role
+    st.markdown(
+        "Use the checkboxes below to mark skills as completed. Click **Save Progress** to record your changes."
+    )
+    # Collect new completed skills based on checkboxes
+    new_completed = []
+    for skill in all_skills:
+        checked = st.checkbox(
+            label=skill,
+            value=(skill in st.session_state['completed_skills']),
+            key=f"prog_{selected_role}_{skill}"
+        )
+        if checked:
+            new_completed.append(skill)
+    # Provide a save button to update the session state and persist the changes
+    if st.button("Save Progress"):
+        st.session_state['completed_skills'] = new_completed
+        # Recalculate missing skills after update
+        missing_skills_list = [s for s in all_skills if s not in new_completed]
+        # Append progress to Google Sheets if email is provided
+        if email:
+            sheet.append_row([
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                email,
+                selected_role,
+                ", ".join(new_completed),
+                ", ".join(missing_skills_list)
+            ])
+        st.success("Progress saved.")
+    # Display the completed vs pending skills as a table
     progress_rows = ""
     for skill in all_skills:
-        status = "Completed" if skill in known_skills else "Pending"
+        status = "Completed" if skill in st.session_state['completed_skills'] else "Pending"
         progress_rows += f"| {skill} | {status} |\n"
     progress_table = "| Skill | Status |\n| --- | --- |\n" + progress_rows
     st.markdown(progress_table, unsafe_allow_html=True)
-
     # Display summary counts
     st.markdown(
-        f"**Summary:** {len(known_skills)} completed, {len(missing_skills)} pending"
+        f"**Summary:** {len(st.session_state['completed_skills'])} completed, {len([s for s in all_skills if s not in st.session_state['completed_skills']])} pending"
     )
 
 # Footer branding
