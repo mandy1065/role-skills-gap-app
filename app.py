@@ -98,42 +98,152 @@ roles = {
     }
 }
 
+# -----------------------------------------------------------------------------
+# Main page title and description
 st.title("Brainyscout Skill Gap Tracker")
-st.markdown("Select your role, mark the skills you already have, and get a list of missing skills with course recommendations.")
+st.markdown(
+    "Select your role, mark the skills you already have, and explore your "
+    "personalised learning plan."
+)
 
-email = st.text_input("Enter your email:", "")
+# -----------------------------------------------------------------------------
+# Sidebar for user inputs
+st.sidebar.title("Your Profile")
+st.sidebar.markdown(
+    "Use the options below to enter your email, choose your role, and select "
+    "the skills you already possess."
+)
 
-selected_role = st.selectbox("Select Role", list(roles.keys()))
+# Email input
+email = st.sidebar.text_input("Enter your email:", "")
+
+# Role selection in sidebar
+selected_role = st.sidebar.selectbox("Select Role", list(roles.keys()))
 all_skills = list(roles[selected_role]["skills"].keys())
 
-known_skills = st.multiselect("Select Known Skills", options=all_skills)
-missing_skills = [skill for skill in all_skills if skill not in known_skills]
+# Initialise session state for completed skills when the role changes
+if "completed_skills" not in st.session_state or st.session_state.get("role") != selected_role:
+    st.session_state["completed_skills"] = []
+    st.session_state["role"] = selected_role
 
-# Save to Google Sheets
-if email:
-    sheet.append_row([
-        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        email,
-        selected_role,
-        ", ".join(known_skills),
-        ", ".join(missing_skills)
-    ])
+# Multiselect to predefine completed/known skills; uses session state as default
+initial_known = st.session_state.get("completed_skills", [])
+known_skills_sidebar = st.sidebar.multiselect(
+    "Select Known Skills", options=all_skills, default=initial_known
+)
 
-# Display missing skills and links
-if missing_skills:
-    st.subheader("Missing Skills & Courses")
-    for skill in missing_skills:
-        link = roles[selected_role]["skills"][skill]
-        st.markdown(f"**{skill}** → [Course Link]({link})")
-else:
-    st.success("You have all the skills for this role!")
+# Synchronise session state with sidebar selection if it changes
+if set(known_skills_sidebar) != set(st.session_state["completed_skills"]):
+    st.session_state["completed_skills"] = known_skills_sidebar
 
-# Full course roadmap
-with st.expander("Full Learning Plan"):
-    st.write(pd.DataFrame({
-        "Skill": list(roles[selected_role]["skills"].keys()),
-        "Course Link": list(roles[selected_role]["skills"].values())
-    }))
+# Determine missing skills based on current completed skills
+missing_skills_list = [s for s in all_skills if s not in st.session_state["completed_skills"]]
 
+# -----------------------------------------------------------------------------
+# Define dashboard tabs
+tab_skill_checker, tab_learning_plan, tab_progress, tab_analytics = st.tabs(
+    ["Skill Checker", "Learning Plan", "Progress Tracker", "Analytics"]
+)
+
+# ----------------------- Skill Checker Tab ------------------------------
+with tab_skill_checker:
+    st.subheader("Missing Skills & Recommended Courses")
+    if missing_skills_list:
+        # Build a list for missing skills and courses
+        for skill in missing_skills_list:
+            link = roles[selected_role]["skills"][skill]
+            st.markdown(f"- **{skill}** -> [Course Link]({link})")
+    else:
+        st.success("You have all the skills for this role!")
+
+# ----------------------- Learning Plan Tab -----------------------------
+with tab_learning_plan:
+    st.subheader("Full Learning Plan for Selected Role")
+    # Construct a markdown table of all skills and their courses for the role
+    lp_rows = ""
+    for skill, link in roles[selected_role]["skills"].items():
+        lp_rows += f"| {skill} | [Link]({link}) |\n"
+    lp_table = "| Skill | Course |\n| --- | --- |\n" + lp_rows
+    st.markdown(lp_table, unsafe_allow_html=True)
+
+    # Personalised learning path based on missing skills
+    st.subheader("Personalised Learning Path")
+    if missing_skills_list:
+        path_rows = ""
+        for idx, skill in enumerate(missing_skills_list, start=1):
+            link = roles[selected_role]["skills"][skill]
+            path_rows += f"| Step {idx} | {skill} | [Link]({link}) |\n"
+        path_table = "| Step | Skill | Course |\n| --- | --- | --- |\n" + path_rows
+        st.markdown(path_table, unsafe_allow_html=True)
+    else:
+        st.success("No missing skills – you're all set!")
+
+# ----------------------- Progress Tracker Tab ---------------------------
+with tab_progress:
+    st.subheader("Skill Progress Tracker")
+    st.markdown(
+        "Use the checkboxes below to mark skills as completed. "
+        "Click **Save Progress** to record your changes."
+    )
+    # Collect new completed skills based on checkboxes
+    new_completed = []
+    for skill in all_skills:
+        checked = st.checkbox(
+            label=skill,
+            value=(skill in st.session_state["completed_skills"]),
+            key=f"prog_{selected_role}_{skill}"
+        )
+        if checked:
+            new_completed.append(skill)
+    # Save progress button
+    if st.button("Save Progress"):
+        # Update session state
+        st.session_state["completed_skills"] = new_completed
+        # Recalculate missing skills after update
+        missing_skills_list = [s for s in all_skills if s not in new_completed]
+        # Append progress to Google Sheets if email is provided
+        if email:
+            sheet.append_row([
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                email,
+                selected_role,
+                ", ".join(new_completed),
+                ", ".join(missing_skills_list)
+            ])
+        st.success("Progress saved.")
+    # Display completed vs pending skills as a table
+    progress_rows = ""
+    for skill in all_skills:
+        status = "Completed" if skill in st.session_state["completed_skills"] else "Pending"
+        progress_rows += f"| {skill} | {status} |\n"
+    progress_table = "| Skill | Status |\n| --- | --- |\n" + progress_rows
+    st.markdown(progress_table, unsafe_allow_html=True)
+    # Display summary counts
+    st.markdown(
+        f"**Summary:** {len(st.session_state['completed_skills'])} completed, "
+        f"{len([s for s in all_skills if s not in st.session_state['completed_skills']])} pending"
+    )
+
+# ----------------------- Analytics Tab --------------------------------
+with tab_analytics:
+    st.subheader("Learning Analytics")
+    st.markdown(
+        "Visualise your progress: compare the number of completed skills "
+        "with those still pending."
+    )
+    # Prepare data for bar chart
+    completed_count = len(st.session_state.get("completed_skills", []))
+    pending_count = len(all_skills) - completed_count
+    analytics_df = pd.DataFrame({
+        "Status": ["Completed", "Pending"],
+        "Count": [completed_count, pending_count]
+    }).set_index("Status")
+    st.bar_chart(analytics_df)
+
+# -----------------------------------------------------------------------------
+# Footer branding
 st.markdown("---")
-st.markdown('<div style="text-align: center;">Powered by Brainyscout</div>', unsafe_allow_html=True)
+st.markdown(
+    '<div style="text-align: center;">Powered by Brainyscout</div>',
+    unsafe_allow_html=True
+)
