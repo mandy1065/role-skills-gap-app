@@ -2,17 +2,19 @@
 import streamlit as st
 import pandas as pd
 import gspread
+import json
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 
-# Setup Google Sheets connection
+# Setup Google Sheets connection using Streamlit secrets
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+creds_dict = json.loads(st.secrets["GCP_CREDENTIALS"])
+creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
 sheet = client.open_by_key("13W17_W3rSIvWCSuYDLo-RX__y365UA7SECB5vOTZ9xs").sheet1
 
-# Available roles and skills
-role_skills = {{
+# Role and skill mapping
+role_skills = {
     "QA Analyst": ["Test case design", "Manual testing", "Bug reporting", "SQL", "Functional testing", "Regression testing", "SDLC knowledge", "Communication"],
     "QA Automation Engineer": ["Python", "Selenium/WebDriver", "API Testing", "CI/CD", "BDD", "Git", "Framework Design"],
     "Software Developer": ["Data Structures", "OOP", "Web Dev", "Databases", "REST APIs", "Version Control", "Unit Testing", "Agile"],
@@ -20,20 +22,20 @@ role_skills = {{
     "Data Analyst": ["SQL", "Excel", "Tableau", "Python (Pandas/Numpy)", "A/B Testing", "Statistics", "Business Communication"],
     "Product Manager": ["Strategic thinking", "Market research", "User-centric design", "Technical writing", "Data analysis", "Agile product development"],
     "Project Manager": ["Project planning", "Agile methodology", "Risk management", "Team communication", "Budgeting", "Scheduling tools"]
-}}
+}
 
 st.title("ðŸ” Brainyscout Skill Tracker")
 
-# Login screen
+# Email-based login
 st.sidebar.header("Login")
-email = st.sidebar.text_input("Enter your email to begin", key="email")
+email = st.sidebar.text_input("Enter your email", key="email")
 
 if email:
-    st.success("Welcome, {} ðŸ‘‹".format(email))
+    st.success(f"Welcome, {email}")
     role = st.selectbox("Select Your Role", list(role_skills.keys()))
     skills = role_skills[role]
 
-    # Load existing data for the user if any
+    # Load data
     records = sheet.get_all_records()
     user_data = next((row for row in records if row["email"] == email), None)
 
@@ -45,19 +47,20 @@ if email:
             known_skills = user_data["known_skills"].split(",") if user_data["known_skills"] else []
             completed_skills = user_data["completed_skills"].split(",") if user_data["completed_skills"] else []
 
+    # Select skills
     st.markdown("### âœ… Select Known Skills")
     selected_known = st.multiselect("Skills you already know", skills, default=known_skills)
 
     st.markdown("### ðŸ Mark Completed Skills")
     selected_completed = st.multiselect("Skills you've completed learning", skills, default=completed_skills)
 
-    # Show missing skills
+    # Display missing
     missing_skills = [s for s in skills if s not in selected_known]
     st.markdown("### âŒ Missing Skills")
     for s in missing_skills:
         st.markdown("- " + s)
 
-    # Save to Google Sheets
+    # Save
     def save_to_sheet():
         existing_row = next((i for i, row in enumerate(records) if row["email"] == email), None)
         new_data = [email, role, ",".join(selected_known), ",".join(selected_completed), str(datetime.now())]
@@ -67,14 +70,14 @@ if email:
         else:
             sheet.append_row(new_data)
 
-        st.success("âœ… Your progress has been saved!")
+        st.success("âœ… Progress saved!")
 
     if st.button("ðŸ’¾ Save Progress"):
         save_to_sheet()
 
-    # Sidebar preview
-    st.sidebar.markdown("### ðŸ” Dashboard")
-    st.sidebar.markdown("**Role:** {}".format(role))
-    st.sidebar.markdown("**Known:** {} skills".format(len(selected_known)))
-    st.sidebar.markdown("**Completed:** {} skills".format(len(selected_completed)))
-    st.sidebar.markdown("**Missing:** {} skills".format(len(missing_skills)))
+    # Sidebar summary
+    st.sidebar.markdown("### ðŸ“Š Dashboard")
+    st.sidebar.markdown(f"**Role:** {role}")
+    st.sidebar.markdown(f"**Known Skills:** {len(selected_known)}")
+    st.sidebar.markdown(f"**Completed Skills:** {len(selected_completed)}")
+    st.sidebar.markdown(f"**Missing Skills:** {len(missing_skills)}")
