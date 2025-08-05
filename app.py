@@ -8,6 +8,56 @@ from datetime import datetime
 
 st.set_page_config(page_title="Brainyscout Skill Gap Tracker", layout="wide")
 
+# Inject custom CSS to enhance the UI aesthetics
+st.markdown(
+    """
+    <style>
+        /* Overall background color for the app */
+        .reportview-container {
+            background-color: #f5f7fa;
+        }
+        /* Style the sidebar: white card with rounded corners */
+        .sidebar .sidebar-content {
+            background-color: #ffffff;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        /* Style the main content container */
+        .block-container {
+            background-color: #ffffff;
+            padding: 2rem 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        /* Style header text */
+        h1 {
+            color: #264653;
+        }
+        /* Style subheader text */
+        h2, h3 {
+            color: #2a9d8f;
+        }
+        /* Style tables generated via markdown */
+        table {
+            width: 100% !important;
+        }
+        th, td {
+            padding: 0.5rem;
+        }
+        /* Style buttons */
+        button[kind="primary"] {
+            background-color: #2a9d8f;
+            color: #ffffff;
+        }
+        button[kind="secondary"] {
+            background-color: #e9c46a;
+            color: #264653;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # Google Sheets Integration
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 creds_dict = json.loads(st.secrets["GCP_CREDENTIALS"])
