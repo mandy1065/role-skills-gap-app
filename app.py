@@ -24,7 +24,7 @@ role_skills = {
     "Project Manager": ["Project planning", "Agile methodology", "Risk management", "Team communication", "Budgeting", "Scheduling tools"]
 }
 
-st.title("ðŸ” Brainyscout Skill Tracker")
+st.title("Brainyscout Skill Tracker")
 
 # Email-based login
 st.sidebar.header("Login")
@@ -48,15 +48,15 @@ if email:
             completed_skills = user_data["completed_skills"].split(",") if user_data["completed_skills"] else []
 
     # Select skills
-    st.markdown("### âœ… Select Known Skills")
+    st.markdown("Select Known Skills")
     selected_known = st.multiselect("Skills you already know", skills, default=known_skills)
 
-    st.markdown("### ðŸ Mark Completed Skills")
+    st.markdown("Mark Completed Skills")
     selected_completed = st.multiselect("Skills you've completed learning", skills, default=completed_skills)
 
     # Display missing
     missing_skills = [s for s in skills if s not in selected_known]
-    st.markdown("### âŒ Missing Skills")
+    st.markdown("Missing Skills")
     for s in missing_skills:
         st.markdown("- " + s)
 
@@ -70,13 +70,13 @@ if email:
         else:
             sheet.append_row(new_data)
 
-        st.success("âœ… Progress saved!")
+        st.success("Progress saved!")
 
-    if st.button("ðŸ’¾ Save Progress"):
+    if st.button("Save Progress"):
         save_to_sheet()
 
     # Sidebar summary
-    st.sidebar.markdown("### ðŸ“Š Dashboard")
+    st.sidebar.markdown("Dashboard")
     st.sidebar.markdown(f"**Role:** {role}")
     st.sidebar.markdown(f"**Known Skills:** {len(selected_known)}")
     st.sidebar.markdown(f"**Completed Skills:** {len(selected_completed)}")
