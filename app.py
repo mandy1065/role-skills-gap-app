@@ -37,6 +37,7 @@ st.markdown('<div class="title">Skill Gap Analyzer</div>', unsafe_allow_html=Tru
 st.markdown('<div class="subtitle">Find missing skills for your role and recommended courses to upskill.</div>', unsafe_allow_html=True)
 
 # Skill mappings
+
 roles = {
     "QA Analyst": {
         "skills": {
@@ -87,6 +88,16 @@ roles = {
         }
     },
     "Data Analyst": {
+        "skills": {
+            "SQL": "https://www.udemy.com/course/sql-for-data-analytics/",
+            "Excel & Google Sheets": "https://www.coursera.org/specializations/excel",
+            "Tableau/Power BI": "https://www.coursera.org/learn/visual-analytics-tableau",
+            "Python (Pandas, Numpy)": "https://www.coursera.org/learn/data-analysis-with-python",
+            "A/B Testing": "https://www.udacity.com/course/ab-testing--ud257",
+            "Statistics": "https://online.stanford.edu/courses/sohs-ystatslearningstatisticallearning",
+            "Business Communication": "https://www.coursera.org/learn/business-writing"
+        }
+    },
     "Product Manager": {
         "skills": {
             "Strategic thinking": "https://www.coursera.org/learn/strategic-management",
@@ -106,27 +117,17 @@ roles = {
             "Budgeting and cost control": "https://www.udemy.com/course/project-budgeting-cost-control/",
             "Project scheduling tools": "https://www.coursera.org/learn/project-management-tools"
         }
-    },
-
-        "skills": {
-            "SQL": "https://www.udemy.com/course/sql-for-data-analytics/",
-            "Excel & Google Sheets": "https://www.coursera.org/specializations/excel",
-            "Tableau/Power BI": "https://www.coursera.org/learn/visual-analytics-tableau",
-            "Python (Pandas, Numpy)": "https://www.coursera.org/learn/data-analysis-with-python",
-            "A/B Testing": "https://www.udacity.com/course/ab-testing--ud257",
-            "Statistics": "https://online.stanford.edu/courses/sohs-ystatslearningstatisticallearning",
-            "Business Communication": "https://www.coursera.org/learn/business-writing"
-        }
     }
 }
 
+
 # Sidebar tracking
 st.sidebar.title("ðŸ“Š Skill Tracking")
-selected_role = st.sidebar.selectbox("Select Role", list(roles.keys()))
+selected_role = st.sidebar.selectbox("Select Role", sorted(roles.keys()))
 tracked_skills = st.sidebar.multiselect("Mark Skills as Completed", list(roles[selected_role]["skills"].keys()))
 
 # Display main section
-role = st.selectbox("Select your role", list(roles.keys()))
+role = st.selectbox("Select your role", sorted(roles.keys()))
 
 if role:
     st.markdown("### Select the skills you already have")
