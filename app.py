@@ -122,7 +122,7 @@ roles = {
 
 
 # Sidebar tracking
-st.sidebar.title("ðŸ“Š Skill Tracking")
+st.sidebar.title(" Skill Tracking")
 selected_role = st.sidebar.selectbox("Select Role", sorted(roles.keys()))
 tracked_skills = st.sidebar.multiselect("Mark Skills as Completed", list(roles[selected_role]["skills"].keys()))
 
@@ -138,17 +138,17 @@ if role:
     if missing_skills:
         st.markdown("### Missing Skills & Recommended Courses")
         for skill in missing_skills:
-            st.markdown(f"- **{skill}** â†’ [Course Link]({roles[role]['skills'][skill]})")
+            st.markdown(f"- **{skill}** -> [Course Link]({roles[role]['skills'][skill]})")
     else:
         st.success("You have all the listed skills for this role!")
 
 # Show tracked progress
 if tracked_skills:
-    st.sidebar.markdown("### âœ… Completed Skills")
+    st.sidebar.markdown("###  Completed Skills")
     for skill in tracked_skills:
         st.sidebar.markdown(f"- {skill}")
 
-    st.sidebar.markdown("### âŒ Pending Skills")
+    st.sidebar.markdown("###  Pending Skills")
     for skill in roles[selected_role]["skills"]:
         if skill not in tracked_skills:
             st.sidebar.markdown(f"- {skill}")
