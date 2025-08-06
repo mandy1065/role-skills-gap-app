@@ -12,7 +12,12 @@ st.set_page_config(page_title="Brainyscout Skill Gap Tracker", layout="wide")
 st.markdown(
     """
     <style>
-        /* Overall background color for the app */
+        /* Ensure consistent light theme across devices */
+        html, body, [data-testid="stApp"] {
+            background-color: #f5f7fa !important;
+            color: #264653 !important;
+        }
+        /* Overall background color for the app's main container */
         .reportview-container {
             background-color: #f5f7fa;
         }
@@ -52,6 +57,10 @@ st.markdown(
         button[kind="secondary"] {
             background-color: #e9c46a;
             color: #264653;
+        }
+        /* Ensure link color is visible in dark or light mode */
+        a, a:visited {
+            color: #1e90ff;
         }
     </style>
     """,
