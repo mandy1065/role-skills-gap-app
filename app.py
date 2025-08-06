@@ -6,6 +6,10 @@ from oauth2client.service_account import ServiceAccountCredentials
 import gspread
 from datetime import datetime
 
+# Import comprehensive interview question data for each role. This module
+# provides 50 behavioural and 50 technical interview questions per role.
+from interview_questions_data import interview_questions
+
 st.set_page_config(page_title="Brainyscout Skill Gap Tracker", layout="wide")
 
 # Inject custom CSS to enhance the UI aesthetics
@@ -163,36 +167,9 @@ roles = {
 # Technical questions cover general topics across roles.  Users can practise
 # answering these questions, view a sample guideline, and receive simple
 # feedback based on answer length and structure.
-interview_questions = {
-    "Behavioral": [
-        {
-            "question": "Tell me about a time you faced a challenge at work.",
-            "answer": "Situation – Describe the context of the challenge. Task – Explain what goal you needed to accomplish. Action – Outline the steps you took to meet the challenge. Result – Share what you achieved and what you learned from the experience."
-        },
-        {
-            "question": "Describe a situation where you worked with a difficult colleague.",
-            "answer": "Situation – Provide the background of the collaboration. Task – Explain what you were trying to accomplish. Action – Detail how you navigated the relationship and resolved conflicts. Result – Summarise the positive outcome and any lessons learned."
-        },
-        {
-            "question": "Give an example of a project you led and the result.",
-            "answer": "Situation – Set the stage for the project. Task – Describe your objectives. Action – Highlight the steps you took and how you collaborated with the team. Result – Quantify your impact and discuss how the project succeeded."
-        }
-    ],
-    "Technical": [
-        {
-            "question": "What is the difference between SQL and NoSQL databases?",
-            "answer": "SQL databases use structured query language and predefined schemas for relational data. NoSQL databases are non-relational, use various data models (document, key–value, graph) and provide flexibility for unstructured data."
-        },
-        {
-            "question": "Explain unit testing and its benefits.",
-            "answer": "Unit testing involves writing tests for individual functions or methods to ensure they work as intended. Benefits include catching bugs early, simplifying debugging, improving code quality and providing documentation for expected behaviour."
-        },
-        {
-            "question": "How does version control (e.g. Git) support collaborative development?",
-            "answer": "Version control systems track changes to code, allow multiple developers to work concurrently, provide branching and merging for new features, and maintain a history of changes so you can revert or review code over time."
-        }
-    ]
-}
+# The old placeholder interview_questions dictionary has been removed. The
+# comprehensive per-role interview question data is imported from
+# interview_questions_data.
 
 # -----------------------------------------------------------------------------
 # Main page title and description
@@ -415,11 +392,16 @@ with tab_interview:
     )
 
     # Allow the user to choose behavioural or technical questions
-    category = st.selectbox("Interview Question Type", list(interview_questions.keys()))
-    questions = [q["question"] for q in interview_questions[category]]
-    selected_question = st.selectbox("Select a question to practise", questions)
+    # Allow the user to choose between behavioural and technical questions.
+    # Categories are consistent across roles and align with the imported data structure.
+    categories = ["Behavioral", "Technical"]
+    category = st.selectbox("Interview Question Type", categories)
+    # Retrieve the list of question dictionaries for the selected role and category
+    questions = interview_questions[selected_role][category]
+    question_texts = [q["question"] for q in questions]
+    selected_question = st.selectbox("Select a question to practise", question_texts)
     # Retrieve the selected question and sample answer
-    question_obj = next(q for q in interview_questions[category] if q["question"] == selected_question)
+    question_obj = next(q for q in questions if q["question"] == selected_question)
     st.markdown(f"**Question:** {selected_question}")
     st.markdown(f"**Sample Answer (Guideline):** {question_obj['answer']}")
 
@@ -448,14 +430,19 @@ with tab_interview:
         for msg in feedback_messages:
             st.success(msg)
         # Save the user's answer in session state for progress tracking
+        # Save the user's answer in session state for progress tracking
         st.session_state.setdefault("interview_answers", {})
-        st.session_state["interview_answers"][selected_question] = user_answer
+        # Ensure answers are stored per role
+        st.session_state["interview_answers"].setdefault(selected_role, {})
+        st.session_state["interview_answers"][selected_role][selected_question] = user_answer
 
     # Display progress summary for interview practice
-    total_questions = sum(len(q_list) for q_list in interview_questions.values())
-    answered_count = len(st.session_state.get("interview_answers", {}))
-    st.markdown(f"You have answered {answered_count} out of {total_questions} interview questions.")
-    # Simple bar chart to visualise interview practise progress
+    # Compute progress for the selected role. Total questions is the sum of behavioural
+    # and technical questions for that role.
+    total_questions = len(interview_questions[selected_role]["Behavioral"]) + len(interview_questions[selected_role]["Technical"])
+    answered_count = len(st.session_state.get("interview_answers", {}).get(selected_role, {}))
+    st.markdown(f"You have answered {answered_count} out of {total_questions} interview questions for the {selected_role} role.")
+    # Simple bar chart to visualise interview practice progress
     interview_prog_df = pd.DataFrame({
         "Status": ["Answered", "Unanswered"],
         "Count": [answered_count, total_questions - answered_count]
