@@ -217,8 +217,20 @@ if not email:
     # will render until the user supplies an email.
     st.stop()
 
-# Role selection in sidebar
-selected_role = st.sidebar.selectbox("Select Role", list(roles.keys()))
+# Role selection in sidebar.  Use a placeholder option so that no role is
+# pre-selected by default.  The list begins with a prompt followed by
+# all available roles.  When the placeholder is chosen, the rest of the
+# application will not proceed until the user selects a real role.
+role_options = ["Select Role"] + list(roles.keys())
+selected_role = st.sidebar.selectbox("Select Role", role_options, index=0)
+
+# If the user has not selected a real role yet (i.e. the placeholder is
+# selected), prompt them and stop execution.  This prevents any skills or
+# analytics from showing until a role is chosen.
+if selected_role == "Select Role":
+    st.sidebar.warning("Please select a role to continue.")
+    st.stop()
+
 all_skills = list(roles[selected_role]["skills"].keys())
 
 # Initialise session state for completed skills when the role changes
@@ -262,6 +274,11 @@ missing_skills_list = [s for s in all_skills if s not in st.session_state["compl
 # will create multiple rows over time but gives a historical view of how
 # the user's knowledge evolves.
 if email:
+    # Only record a row if a real role has been selected.  Because the
+    # placeholder "Select Role" causes an early stop above, this code is
+    # only reached when the user has chosen a valid role.  Recording the
+    # timestamped progress on each run provides a historical log of
+    # selections.
     try:
         sheet.append_row([
             datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
