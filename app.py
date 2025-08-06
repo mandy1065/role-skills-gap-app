@@ -204,6 +204,19 @@ st.sidebar.markdown(
 # Email input
 email = st.sidebar.text_input("Enter your email:", "")
 
+# -----------------------------------------------------------------------------
+# If the user has not provided an email address yet, halt the application after
+# displaying a prompt.  This ensures that users first enter their email
+# before they start exploring roles or selecting skills.  Preventing the rest
+# of the app from running until an email is entered also prevents accidental
+# writes to the Google Sheet without a user identifier.
+if not email:
+    st.sidebar.warning("Please enter your email to continue.")
+    # Use st.stop() to gracefully stop further execution until an email is
+    # provided.  None of the downstream UI (role selector, skills, tabs)
+    # will render until the user supplies an email.
+    st.stop()
+
 # Role selection in sidebar
 selected_role = st.sidebar.selectbox("Select Role", list(roles.keys()))
 all_skills = list(roles[selected_role]["skills"].keys())
