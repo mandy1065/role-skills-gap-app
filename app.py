@@ -149,6 +149,43 @@ roles = {
 }
 
 # -----------------------------------------------------------------------------
+# Interview practice questions and sample answers.  Behavioural questions use
+# the STAR (Situation, Task, Action, Result) method to structure answers.
+# Technical questions cover general topics across roles.  Users can practise
+# answering these questions, view a sample guideline, and receive simple
+# feedback based on answer length and structure.
+interview_questions = {
+    "Behavioral": [
+        {
+            "question": "Tell me about a time you faced a challenge at work.",
+            "answer": "Situation – Describe the context of the challenge. Task – Explain what goal you needed to accomplish. Action – Outline the steps you took to meet the challenge. Result – Share what you achieved and what you learned from the experience."
+        },
+        {
+            "question": "Describe a situation where you worked with a difficult colleague.",
+            "answer": "Situation – Provide the background of the collaboration. Task – Explain what you were trying to accomplish. Action – Detail how you navigated the relationship and resolved conflicts. Result – Summarise the positive outcome and any lessons learned."
+        },
+        {
+            "question": "Give an example of a project you led and the result.",
+            "answer": "Situation – Set the stage for the project. Task – Describe your objectives. Action – Highlight the steps you took and how you collaborated with the team. Result – Quantify your impact and discuss how the project succeeded."
+        }
+    ],
+    "Technical": [
+        {
+            "question": "What is the difference between SQL and NoSQL databases?",
+            "answer": "SQL databases use structured query language and predefined schemas for relational data. NoSQL databases are non-relational, use various data models (document, key–value, graph) and provide flexibility for unstructured data."
+        },
+        {
+            "question": "Explain unit testing and its benefits.",
+            "answer": "Unit testing involves writing tests for individual functions or methods to ensure they work as intended. Benefits include catching bugs early, simplifying debugging, improving code quality and providing documentation for expected behaviour."
+        },
+        {
+            "question": "How does version control (e.g. Git) support collaborative development?",
+            "answer": "Version control systems track changes to code, allow multiple developers to work concurrently, provide branching and merging for new features, and maintain a history of changes so you can revert or review code over time."
+        }
+    ]
+}
+
+# -----------------------------------------------------------------------------
 # Main page title and description
 st.title("Brainyscout Skill Gap Tracker")
 st.markdown(
@@ -176,23 +213,61 @@ if "completed_skills" not in st.session_state or st.session_state.get("role") !=
     st.session_state["completed_skills"] = []
     st.session_state["role"] = selected_role
 
-# Multiselect to predefine completed/known skills; uses session state as default
-initial_known = st.session_state.get("completed_skills", [])
-known_skills_sidebar = st.sidebar.multiselect(
-    "Select Known Skills", options=all_skills, default=initial_known
-)
+# -----------------------------------------------------------------------------
+# Replace the multiselect for known skills with individual checkboxes.  A list
+# accumulates the skills that the user marks as known.  This makes it easier
+# for users to see all skills at once rather than opening a dropdown.  The
+# selections are stored in ``st.session_state['completed_skills']`` so the rest
+# of the app (progress tracker, analytics, etc.) stays in sync.
 
-# Synchronise session state with sidebar selection if it changes
-if set(known_skills_sidebar) != set(st.session_state["completed_skills"]):
-    st.session_state["completed_skills"] = known_skills_sidebar
+# Build a list of known skills based on checkbox selections in the sidebar.
+checkbox_known_skills: list[str] = []
+for skill in all_skills:
+    # Use a unique key per role and skill to preserve individual checkbox state
+    chk_key = f"sidebar_known_{selected_role}_{skill}"
+    checked = st.sidebar.checkbox(
+        label=skill,
+        value=(skill in st.session_state.get("completed_skills", [])),
+        key=chk_key
+    )
+    if checked:
+        checkbox_known_skills.append(skill)
+
+# Update session state when the selections differ
+if set(checkbox_known_skills) != set(st.session_state.get("completed_skills", [])):
+    st.session_state["completed_skills"] = checkbox_known_skills
 
 # Determine missing skills based on current completed skills
 missing_skills_list = [s for s in all_skills if s not in st.session_state["completed_skills"]]
 
 # -----------------------------------------------------------------------------
-# Define dashboard tabs
-tab_skill_checker, tab_learning_plan, tab_progress, tab_analytics = st.tabs(
-    ["Skill Checker", "Learning Plan", "Progress Tracker", "Analytics"]
+# Automatically record the user's selections to Google Sheets if they have
+# provided an email address.  This allows progress to persist without
+# requiring the user to explicitly click "Save Progress".  Each record
+# includes a timestamp, the user's email, their selected role, the skills
+# they have marked as known/completed and the skills still missing.  This
+# will create multiple rows over time but gives a historical view of how
+# the user's knowledge evolves.
+if email:
+    try:
+        sheet.append_row([
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            email,
+            selected_role,
+            ", ".join(st.session_state["completed_skills"]),
+            ", ".join(missing_skills_list)
+        ])
+    except Exception:
+        # Silently ignore errors to avoid interrupting the UI.  This could
+        # happen if the sheet is temporarily unavailable.  The progress
+        # tracker will still attempt to save changes when the user clicks
+        # "Save Progress".
+        pass
+
+# -----------------------------------------------------------------------------
+# Define dashboard tabs including Interview Practice
+tab_skill_checker, tab_learning_plan, tab_progress, tab_analytics, tab_interview = st.tabs(
+    ["Skill Checker", "Learning Plan", "Progress Tracker", "Analytics", "Interview Practice"]
 )
 
 # ----------------------- Skill Checker Tab ------------------------------
@@ -289,6 +364,65 @@ with tab_analytics:
         "Count": [completed_count, pending_count]
     }).set_index("Status")
     st.bar_chart(analytics_df)
+
+# ----------------------- Interview Practice Tab ---------------------------
+with tab_interview:
+    st.subheader("Interview Practice")
+    st.markdown(
+        "Select a type of question (behavioural or technical), practise your "
+        "answer, and receive instant feedback. Behavioural answers should be "
+        "structured using the STAR method (Situation, Task, Action, Result) as "
+        "recommended for interview responses【892174856631884†L139-L159】."
+    )
+
+    # Allow the user to choose behavioural or technical questions
+    category = st.selectbox("Interview Question Type", list(interview_questions.keys()))
+    questions = [q["question"] for q in interview_questions[category]]
+    selected_question = st.selectbox("Select a question to practise", questions)
+    # Retrieve the selected question and sample answer
+    question_obj = next(q for q in interview_questions[category] if q["question"] == selected_question)
+    st.markdown(f"**Question:** {selected_question}")
+    st.markdown(f"**Sample Answer (Guideline):** {question_obj['answer']}")
+
+    # Text area for the user's answer
+    user_answer = st.text_area("Your Answer", "", height=150)
+
+    # Container for feedback messages
+    if st.button("Submit Answer"):
+        # Basic evaluation criteria: length and use of STAR keywords for behavioural questions
+        feedback_messages = []
+        word_count = len(user_answer.split())
+        if word_count < 50:
+            feedback_messages.append("Your answer seems short; try elaborating more.")
+        # Check for STAR method keywords in behavioural answers
+        if category == "Behavioral":
+            star_keywords = ["situation", "task", "action", "result"]
+            star_used = any(k in user_answer.lower() for k in star_keywords)
+            if not star_used:
+                feedback_messages.append(
+                    "Consider using the STAR structure: describe the Situation, "
+                    "Task, Action and Result explicitly."
+                )
+        if not feedback_messages:
+            feedback_messages.append("Great job! Your answer covers the key points.")
+        # Display feedback
+        for msg in feedback_messages:
+            st.success(msg)
+        # Save the user's answer in session state for progress tracking
+        st.session_state.setdefault("interview_answers", {})
+        st.session_state["interview_answers"][selected_question] = user_answer
+
+    # Display progress summary for interview practice
+    total_questions = sum(len(q_list) for q_list in interview_questions.values())
+    answered_count = len(st.session_state.get("interview_answers", {}))
+    st.markdown(f"You have answered {answered_count} out of {total_questions} interview questions.")
+    # Simple bar chart to visualise interview practise progress
+    interview_prog_df = pd.DataFrame({
+        "Status": ["Answered", "Unanswered"],
+        "Count": [answered_count, total_questions - answered_count]
+    }).set_index("Status")
+    st.bar_chart(interview_prog_df)
+
 
 # -----------------------------------------------------------------------------
 # Footer branding
