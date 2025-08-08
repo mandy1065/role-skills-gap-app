@@ -82,23 +82,23 @@ sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/13W17_W3rSIvW
 roles = {
     "QA Analyst": {
         "skills": {
-            "Test case design": "https://www.coursera.org/learn/software-testing",
+            "Test case design": "https://imp.i384100.net/550PBo",
             "Manual testing": "https://www.udemy.com/course/manual-software-testing/",
             "Bug reporting (JIRA)": "https://www.udemy.com/course/jira-tutorial-a-complete-guide-for-beginners/",
-            "SQL for data validation": "https://www.coursera.org/learn/sql-for-data-science",
+            "SQL for data validation": "https://imp.i384100.net/APMX1K",
             "Functional testing": "https://www.udemy.com/course/software-testing/",
             "Regression testing": "https://www.linkedin.com/learning/",
             "SDLC knowledge": "https://www.youtube.com/watch?v=xtPYTfLJZBM",
-            "Communication skills": "https://www.coursera.org/learn/business-communication"
+            "Communication skills": "https://imp.i384100.net/Z6j3vK"
         }
     },
     "QA Automation Engineer": {
         "skills": {
-            "Python": "https://www.coursera.org/specializations/python",
+            "Python": "https://imp.i384100.net/K0d3v7",
             "Selenium/WebDriver": "https://www.udemy.com/course/selenium-real-time-examplesinterview-questions/",
-            "API Testing (Postman)": "https://www.coursera.org/learn/postman-api",
+            "API Testing (Postman)": "https://imp.i384100.net/DydzZ5",
             "TestNG/PyTest": "https://www.udemy.com/course/pytest-tutorial/",
-            "CI/CD with Jenkins": "https://www.coursera.org/learn/continuous-integration",
+            "CI/CD with Jenkins": "https://imp.i384100.net/raNoqj",
             "Version Control (Git)": "https://www.codecademy.com/learn/learn-git",
             "BDD (Cucumber/Gherkin)": "https://www.udemy.com/course/bdd-with-selenium-webdriver-and-cucumber/",
             "Framework Design": "https://www.udemy.com/course/test-automation-frameworks/"
@@ -106,57 +106,57 @@ roles = {
     },
     "Software Developer": {
         "skills": {
-            "Data Structures & Algorithms": "https://www.coursera.org/specializations/data-structures-algorithms",
-            "OOP (Java/Python/C#)": "https://www.coursera.org/learn/python-object-oriented-programming",
+            "Data Structures & Algorithms": "https://imp.i384100.net/e1ZP21",
+            "OOP (Java/Python/C#)": "https://imp.i384100.net/o46Zvo",
             "HTML/CSS/JavaScript": "https://www.freecodecamp.org/learn/",
             "SQL/NoSQL": "https://lagunita.stanford.edu/courses/DB/2014/SelfPaced/about",
             "REST APIs": "https://www.udacity.com/course/api-development-and-documentation--ud805",
             "Git/GitHub": "https://www.youtube.com/watch?v=RGOj5yH7evk",
-            "Unit Testing": "https://www.coursera.org/learn/automated-software-testing",
-            "Agile Development": "https://www.coursera.org/learn/agile-atlassian-jira"
+            "Unit Testing": "https://imp.i384100.net/nX6JvV",
+            "Agile Development": "https://imp.i384100.net/6yM51Q"
         }
     },
     "Data Engineer": {
         "skills": {
             "SQL & NoSQL": "https://mode.com/sql-tutorial/",
             "ETL pipelines": "https://www.udemy.com/course/etl-and-data-pipelines-with-python/",
-            "Python/Scala": "https://www.coursera.org/learn/python-data-analysis",
-            "Big Data (Spark, Hadoop)": "https://www.coursera.org/learn/intro-to-apache-spark",
-            "Data Warehousing": "https://www.coursera.org/learn/dwh",
-            "Cloud (AWS/GCP/Azure)": "https://www.coursera.org/professional-certificates/data-engineering-gcp",
+            "Python/Scala": "https://imp.i384100.net/2a09e0",
+            "Big Data (Spark, Hadoop)": "https://imp.i384100.net/4GnjA0",
+            "Data Warehousing": "https://imp.i384100.net/N9y3Jq",
+            "Cloud (AWS/GCP/Azure)": "https://imp.i384100.net/yq6QvN",
             "Apache Airflow": "https://www.udemy.com/course/the-complete-hands-on-course-to-master-apache-airflow/",
-            "Data Modeling": "https://www.coursera.org/learn/data-modeling"
+            "Data Modeling": "https://imp.i384100.net/LKd31V"
         }
     },
     "Data Analyst": {
         "skills": {
             "SQL": "https://www.udemy.com/course/sql-for-data-analytics/",
-            "Excel & Google Sheets": "https://www.coursera.org/specializations/excel",
-            "Tableau/Power BI": "https://www.coursera.org/learn/visual-analytics-tableau",
-            "Python (Pandas, Numpy)": "https://www.coursera.org/learn/data-analysis-with-python",
+            "Excel & Google Sheets": "https://imp.i384100.net/xL6Dvx",
+            "Tableau/Power BI": "https://imp.i384100.net/9LdaZ4",
+            "Python (Pandas, Numpy)": "https://imp.i384100.net/550P0b",
             "A/B Testing": "https://www.udacity.com/course/ab-testing--ud257",
             "Statistics": "https://online.stanford.edu/courses/sohs-ystatslearningstatisticallearning",
-            "Business Communication": "https://www.coursera.org/learn/business-writing"
+            "Business Communication": "https://imp.i384100.net/kO2G20"
         }
     },
     "Product Manager": {
         "skills": {
-            "Strategic thinking": "https://www.coursera.org/learn/strategic-management",
-            "Market research": "https://www.coursera.org/learn/market-research",
-            "User-centric design": "https://www.coursera.org/specializations/interaction-design",
+            "Strategic thinking": "https://imp.i384100.net/Dydzdb",
+            "Market research": "https://imp.i384100.net/9LdadE",
+            "User-centric design": "https://imp.i384100.net/raNoND",
             "Technical documentation": "https://www.udemy.com/course/technical-writing/",
-            "Data analysis": "https://www.coursera.org/learn/data-analysis-with-python",
-            "Agile product development": "https://www.coursera.org/learn/agile-development"
+            "Data analysis": "https://imp.i384100.net/550P0b",
+            "Agile product development": "https://imp.i384100.net/e1ZPZQ"
         }
     },
     "Project Manager": {
         "skills": {
-            "Project planning": "https://www.coursera.org/learn/project-management-principles",
-            "Agile methodology": "https://www.coursera.org/learn/agile-project-management",
-            "Risk management": "https://www.coursera.org/learn/project-risk-management",
-            "Team communication": "https://www.coursera.org/learn/communication-in-the-21st-century-workplace",
+            "Project planning": "https://imp.i384100.net/aOGQGY",
+            "Agile methodology": "https://imp.i384100.net/GKd3d2",
+            "Risk management": "https://imp.i384100.net/Z6j3jz",
+            "Team communication": "https://imp.i384100.net/Xm9393",
             "Budgeting and cost control": "https://www.udemy.com/course/project-budgeting-cost-control/",
-            "Project scheduling tools": "https://www.coursera.org/learn/project-management-tools"
+            "Project scheduling tools": "https://imp.i384100.net/zxm9mG"
         }
     }
 }
