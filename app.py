@@ -82,50 +82,50 @@ sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/13W17_W3rSIvW
 roles = {
     "QA Analyst": {
         "skills": {
-            "Test case design": "https://imp.i384100.net/550PBo",
-            "Manual testing": "https://www.udemy.com/course/manual-software-testing/",
-            "Bug reporting (JIRA)": "https://www.udemy.com/course/jira-tutorial-a-complete-guide-for-beginners/",
+            "Test case design": "https://imp.i384100.net/EEdv6e",
+            "Manual testing": "https://www.udemy.com/course/learn-manual-software-testing-with-live-project-jira-tool/?couponCode=MT80825B",
+            "Bug reporting (JIRA)": "https://www.udemy.com/course/learn-manual-software-testing-with-live-project-jira-tool/?couponCode=MT80825B",
             "SQL for data validation": "https://imp.i384100.net/APMX1K",
-            "Functional testing": "https://www.udemy.com/course/software-testing/",
-            "Regression testing": "https://www.linkedin.com/learning/",
-            "SDLC knowledge": "https://www.youtube.com/watch?v=xtPYTfLJZBM",
-            "Communication skills": "https://imp.i384100.net/Z6j3vK"
+            "Functional testing": "https://www.udemy.com/course/functional-software-testing-interview-bootcamp-land-the-job/?couponCode=MT80825B",
+            "Regression testing": "https://www.youtube.com/watch?v=0wHKVXbsppw&pp=ygUTcmVncmVzc2lvbiB0ZXN0aW5nIA%3D%3D",
+            "SDLC knowledge": "https://www.youtube.com/watch?v=xNwtCtxfSuM",
+            "Communication skills": "https://imp.i384100.net/JKdyNr"
         }
     },
     "QA Automation Engineer": {
         "skills": {
             "Python": "https://imp.i384100.net/K0d3v7",
             "Selenium/WebDriver": "https://www.udemy.com/course/selenium-real-time-examplesinterview-questions/",
-            "API Testing (Postman)": "https://imp.i384100.net/DydzZ5",
-            "TestNG/PyTest": "https://www.udemy.com/course/pytest-tutorial/",
+            "API Testing (Postman)": "https://imp.i384100.net/dOJjYK",
+            "TestNG/PyTest": "https://www.udemy.com/course/python-automation-pytest/",
             "CI/CD with Jenkins": "https://imp.i384100.net/raNoqj",
             "Version Control (Git)": "https://www.codecademy.com/learn/learn-git",
-            "BDD (Cucumber/Gherkin)": "https://www.udemy.com/course/bdd-with-selenium-webdriver-and-cucumber/",
-            "Framework Design": "https://www.udemy.com/course/test-automation-frameworks/"
+            "BDD (Cucumber/Gherkin)": "https://www.udemy.com/course/python-automation-pytest/?couponCode=MT80825B",
+            
         }
     },
     "Software Developer": {
         "skills": {
             "Data Structures & Algorithms": "https://imp.i384100.net/e1ZP21",
-            "OOP (Java/Python/C#)": "https://imp.i384100.net/o46Zvo",
+            "OOP (Java/Python/C#)": "https://www.youtube.com/watch?v=iLRZi0Gu8Go&pp=ygUUT09QIChKYXZhL1B5dGhvbi9DIyk%3D",
             "HTML/CSS/JavaScript": "https://www.freecodecamp.org/learn/",
-            "SQL/NoSQL": "https://lagunita.stanford.edu/courses/DB/2014/SelfPaced/about",
+            "SQL/NoSQL": "https://www.youtube.com/watch?v=sDtnlPdqwWI&pp=ygUcU1FML05vU1FMIHNvZnR3YXJlIGRldmVsb3Blcg%3D%3D",
             "REST APIs": "https://www.udacity.com/course/api-development-and-documentation--ud805",
-            "Git/GitHub": "https://www.youtube.com/watch?v=RGOj5yH7evk",
-            "Unit Testing": "https://imp.i384100.net/nX6JvV",
+            "Git/GitHub": "https://imp.i384100.net/POdN5Q",
+            "Unit Testing": "https://www.youtube.com/watch?v=vZm0lHciFsQ&pp=ygUUdW5pdCB0ZXN0aW5nIGluIGphdmE%3D",
             "Agile Development": "https://imp.i384100.net/6yM51Q"
         }
     },
     "Data Engineer": {
         "skills": {
             "SQL & NoSQL": "https://mode.com/sql-tutorial/",
-            "ETL pipelines": "https://www.udemy.com/course/etl-and-data-pipelines-with-python/",
+            "ETL pipelines": "https://www.youtube.com/watch?v=T23Bs75F7ZQ&pp=ygUjZXRsLWFuZC1kYXRhLXBpcGVsaW5lcy13aXRoLXB5dGhvbi8%3D",
             "Python/Scala": "https://imp.i384100.net/2a09e0",
-            "Big Data (Spark, Hadoop)": "https://imp.i384100.net/4GnjA0",
-            "Data Warehousing": "https://imp.i384100.net/N9y3Jq",
-            "Cloud (AWS/GCP/Azure)": "https://imp.i384100.net/yq6QvN",
+            "Big Data (Spark, Hadoop)": "https://www.youtube.com/watch?v=ouGO3Up7aWE&pp=ygUYQmlnIERhdGEgKFNwYXJrLCBIYWRvb3Ap",
+            "Data Warehousing": "https://www.youtube.com/watch?v=HKcEyHF1U00&pp=ygUQRGF0YSBXYXJlaG91c2luZw%3D%3D",
+            "Cloud (AWS/GCP/Azure)": "https://www.udemy.com/course/the-complete-introduction-to-cloud-with-aws-azure-and-gcp/?couponCode=MT80825B",
             "Apache Airflow": "https://www.udemy.com/course/the-complete-hands-on-course-to-master-apache-airflow/",
-            "Data Modeling": "https://imp.i384100.net/LKd31V"
+            "Data Modeling": "https://www.udemy.com/course/data-warehouse-the-ultimate-guide/"
         }
     },
     "Data Analyst": {
@@ -134,8 +134,8 @@ roles = {
             "Excel & Google Sheets": "https://imp.i384100.net/xL6Dvx",
             "Tableau/Power BI": "https://imp.i384100.net/9LdaZ4",
             "Python (Pandas, Numpy)": "https://imp.i384100.net/550P0b",
-            "A/B Testing": "https://www.udacity.com/course/ab-testing--ud257",
-            "Statistics": "https://online.stanford.edu/courses/sohs-ystatslearningstatisticallearning",
+            "A/B Testing": "https://www.youtube.com/watch?v=KZe0C0Qq4p0&pp=ygULQS9CIFRlc3RpbmfSBwkJrQkBhyohjO8%3D",
+            "Statistics": "https://www.youtube.com/watch?v=npgbI8KYvN8&pp=ygUXc3RhdGlzdGljcyBkYXRhIGFuYWx5c3Q%3D",
             "Business Communication": "https://imp.i384100.net/kO2G20"
         }
     },
@@ -146,7 +146,7 @@ roles = {
             "User-centric design": "https://imp.i384100.net/raNoND",
             "Technical documentation": "https://www.udemy.com/course/technical-writing/",
             "Data analysis": "https://imp.i384100.net/550P0b",
-            "Agile product development": "https://imp.i384100.net/e1ZPZQ"
+            "Agile product development": "https://www.youtube.com/watch?v=bQdwNN6i8aA&pp=ygUpQWdpbGUgcHJvZHVjdCBkZXZlbG9wbWVudCBwcm9kdWN0IG1hbmFnZXI%3D"
         }
     },
     "Project Manager": {
@@ -154,9 +154,9 @@ roles = {
             "Project planning": "https://imp.i384100.net/aOGQGY",
             "Agile methodology": "https://imp.i384100.net/GKd3d2",
             "Risk management": "https://imp.i384100.net/Z6j3jz",
-            "Team communication": "https://imp.i384100.net/Xm9393",
-            "Budgeting and cost control": "https://www.udemy.com/course/project-budgeting-cost-control/",
-            "Project scheduling tools": "https://imp.i384100.net/zxm9mG"
+            "Team communication": "https://www.youtube.com/watch?v=CJr1e2Lp5dI&pp=ygUiVGVhbSBjb21tdW5pY2F0aW9uIHByb2plY3QgbWFuYWdlcg%3D%3D",
+            "Budgeting and cost control": "https://www.youtube.com/watch?v=2H59thd0W2k&pp=ygUfL3Byb2plY3QtYnVkZ2V0aW5nLWNvc3QtY29udHJvbA%3D%3D",
+            "Project scheduling tools": "https://www.youtube.com/watch?v=nIFEaS2xmvg"
         }
     }
 }
